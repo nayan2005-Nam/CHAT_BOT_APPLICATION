@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chatbot Assistant</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: #4a90e2;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 0.8rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 1rem;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    .user {
+      background-color: #d1e7dd;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      align-self: flex-start;
+    }
+
+    .typing {
+      font-style: italic;
+      color: gray;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 0.75rem;
+      border-top: 1px solid #ddd;
+      background-color: #fff;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 1.5rem;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .input-area button {
+      margin-left: 0.5rem;
+      padding: 0.75rem 1.2rem;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 1.5rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .input-area button:hover {
+      background-color: #3b7cc4;
+    }
+
+    @media (max-width: 600px) {
+      .message {
+        max-width: 85%;
+        font-size: 0.95rem;
+      }
+
+      header {
+        font-size: 1.2rem;
+      }
+
+      .input-area input {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>Chatbot Assistant</header>
+
+  <div class="chat-container" id="chat">
+    <!-- Messages will appear here -->
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+  const chat = document.getElementById("chat");
+
+  function appendMessage(content, className) {
+    const msg = document.createElement("div");
+    msg.className = "message " + className;
+    msg.textContent = content;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function showTypingIndicator() {
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.id = "typing";
+    typing.textContent = "Bot is typing...";
+    chat.appendChild(typing);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+  }
+
+  function sendMessage() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    appendMessage(text, "user");
+    input.value = "";
+
+    showTypingIndicator();
+
+    fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+      removeTypingIndicator();
+      appendMessage(data.response, "bot");
+    })
+    .catch(() => {
+      removeTypingIndicator();
+      appendMessage("Error: Unable to reach the server.", "bot");
+    });
+  }
+
+  document.getElementById("userInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
+</body>
+</html>
