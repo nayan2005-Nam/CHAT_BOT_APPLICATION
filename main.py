@@ -10,9 +10,9 @@ CORS(app)
 name = None
 chat_history = []
 
-WEATHER_API_KEYS = "46f39b60cd5f7dc35fd549b7d4ec833f"
-NEWS_API_KEYS = "10127189f9a245bdb8da23af92202a7b"
-CURRENCY_API_KEYS = "3a2141a32ab11fbc16edc830"
+WEATHER_API_KEYS = "Add_Keys"
+NEWS_API_KEYS = "Add_keys"
+CURRENCY_API_KEYS = "Add_keys"
 
 def clean_city_name(text):
     return re.sub(r'[^a-zA-Z\\s]', '', text).strip()
